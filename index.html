@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Jade Delight</title>
+
+<script language="javascript">
+	function validateForm()
+	{
+		var last_name = document.form.lname;
+		var phone_number = document.form.phone;
+		var user_street = document.form.street;
+		var user_city = document.form.city;
+
+		if((last_name.value == "") || last_name.value == null) {
+			alert("Please enter your last name");
+			last_name.focus();
+			return false;
+		}
+		if(!validatePhoneNumber(phone_number.value)) {
+			alert("Please enter the phone number in format XXX-XXX-XXXX");
+			phone_number.select();
+			phone_number.focus();
+			return false;
+
+		}
+		if ((document.getElementsByName("p_or_d")[1]).checked) {
+			if ((user_street.value == "") || (user_street.value == null)) {
+				alert("Required [house number street name] for delivery");
+				user_street.focus();
+				return false;
+			}
+			if ((user_city.value == "") || (user_city.value == null)) {
+				alert("Required city name for delivery");
+				user_city.focus();
+				return false;
+			}
+		}
+
+		checkDeliveryPickup();
+		return true;
+	}
+
+	function validatePhoneNumber(number)
+	{
+		if (number.length != 12) {
+			alert("Phone number not proper length");
+			return false;
+		}
+		
+		var nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+		for(i = 0; i < 12; i++) {
+			if ((i != 3) && (i != 7)) {
+				x = parseInt(number[i]);
+				if(nums.indexOf(x) == -1) {
+					alert("X must be a number between 0 and 9");
+					return false;
+				}
+			}
+			else {
+				x = number[i];
+				if (x != "-") {
+					alert("Phone number not seperated by '-'");
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	function checkDeliveryPickup()
+	{
+		// Obtaining current time
+		var today = new Date();
+		var h = today.getHours();
+		var m = today.getMinutes();
+		var s = today.getSeconds();
+
+		var p = (document.getElementsByName("p_or_d")[0]).checked;
+		var time_order;
+		if (p == true) {
+			if (m >= 45) {
+				h = h + 1;
+				m = (m + 15) - 60;
+			}
+			else {
+				m = m + 15;
+			}
+			str_time = h + ":" + m + ":" + s;
+			str_total = " Your order total is: $" + document.form.total.value;
+			str_final = "Thank you very Much for your Order! Your pickup time is: " + str_time + str_total;
+			alert(str_final);
+		}
+		else {
+			if (m >= 30) {
+				h = h + 1;
+				m = (m + 30) - 60;
+			}
+			else {
+				m = m + 30;
+			}
+			str_time = h + ":" + m + ":" + s;
+			str_total = " Your order total is: $" + document.form.total.value;
+			str_final = "Thank you very Much for your Order! Your delivery time is: " + str_time + str_total;
+			alert(str_final);
+		}
+	}
+
+</script>
+</head>
+
+<body>
+<script language="javascript">
+
+function MenuItem(name, cost)
+{
+	this.name = name;
+	this.cost=cost;
+}
+
+menuItems = new Array(
+	new MenuItem("Chicken Chop Suey", 4.5),
+	new MenuItem("Sweet and Sour Pork", 6.25),
+	new MenuItem("Shrimp Lo Mein", 5.25),
+	new MenuItem("Moo Shi Chicken", 6.5),
+	new MenuItem("Fried Rice", 2.35)
+);
+
+function makeSelect(name, minRange, maxRange)
+{
+	var t= "";
+	t = "<select name='" + name + "' size='1'>";
+	for (j=minRange; j<=maxRange; j++)
+	   t += "<option>" + j + "</option>";
+	t+= "</select>"; 
+	return t;
+}
+</script>
+
+<h1>Jade Delight</h1>
+<form name="form" onSubmit="return validateForm()">
+<p>First Name: <input type="text"  name='fname' /></p>
+<p>Last Name*:  <input type="text"  name='lname' /></div></p>
+<p>Street: <input type="text"  name='street' /></p>
+<p>City: <input type="text"  name='city' /></p>
+<p>Phone* (format xxx-xxx-xxxx): <input type="text"  name='phone' /></p>
+<p> 
+	<input type="radio"  name="p_or_d" value = "pickup" checked="checked"/>Pickup  
+	<input type="radio"  name='p_or_d' value = 'delivery'/>
+	Delivery
+</p>
+<table border="0" cellpadding="3">
+  <tr>
+    <th>Select Item</th>
+    <th>Item Name</th>
+    <th>Cost Each</th>
+    <th>Total Cost</th>
+  </tr>
+<script language="javascript">
+
+  var s = "";
+  for (i=0; i< menuItems.length; i++)
+  {
+	  s += "<tr><td>";
+	  s += makeSelect("quan" + i, 0, 10);
+	  s += "</td><td>" + menuItems[i].name + "</td>";
+	  s += "<td> $ " + menuItems[i].cost.toFixed(2) + "</td>";
+	  s += "<td>$<input type='text' name='cost'/></td></tr>";
+  }
+  document.writeln(s);
+</script>
+
+</table>
+<p>Subtotal: 
+   $<input type="text"  name='subtotal' id="subtotal" />
+</p>
+<p>Mass tax 6.25%:
+  $ <input type="text"  name='tax' id="tax" />
+</p>
+<p>Total: $ <input type="text"  name='total' id="total" />
+</p>
+
+<input type = "submit" value = "Submit Order" />
+
+<!-- Javascript code to process the selection items and compute the costs -->
+<script language="javascript">
+	var selected = document.getElementsByTagName("select");
+	var input = document.getElementsByTagName("input");
+	var curr_cost = [0, 0, 0, 0, 0];
+	for (i = 0; i < selected.length; i++) {
+		selected[i].onchange = function() {computeItemCost()};
+	}
+	
+	// Calculate the cost for each meanuItem after option was chosen
+	function computeItemCost()
+	{
+		var element = event.target;
+		var name = element.name;
+		var item_number = parseInt(name[4]);
+
+		var item_cost = element.value * menuItems[item_number].cost;
+		input[7 + item_number].value = item_cost;
+
+		curr_cost[item_number] = item_cost;
+
+		computeOverallCost();
+	}
+
+	// Calculate the newest subtotal, tax, and total costs
+	function computeOverallCost()
+	{
+		var subtotal = 0;
+		var mass_tax_percent = 0.0625;
+
+		for (i = 0; i < curr_cost.length; i++) {
+			subtotal += curr_cost[i];
+		}
+
+		var mass_tax = (subtotal * mass_tax_percent).toFixed(2)
+		var total = parseFloat(subtotal) + parseFloat(mass_tax);
+		
+		input['subtotal'].value = subtotal;
+		input['tax'].value = mass_tax;
+		input['total'].value = total;
+	}
+</script>
+</form>
+
+</body>
+</html>
